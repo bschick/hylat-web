@@ -1,0 +1,262 @@
+<p class="input-spacing" style="font-size: 28px; margin-top: 0px">
+  <mat-icon inline="true" style="position: relative; top: 5px">people</mat-icon>
+  Team Generator
+</p>
+<button
+  mat-raised-button
+  (click)="onMakeTeamsClicked()"
+  class="input-button"
+  color="primary"
+  matTooltip="Create teams from people list"
+>
+  Make Teams
+</button>
+<button
+  mat-raised-button
+  (click)="fileUpload.click()"
+  class="input-button"
+  color="basic"
+  matTooltip="Load file containing people"
+>
+  Load File
+  <mat-icon>attach_file</mat-icon>
+</button>
+<button
+  mat-raised-button
+  (click)="onLoadExampleClicked()"
+  class="input-button"
+  color="basic"
+  matTooltip="Load example people list"
+>
+  Load Example
+</button>
+
+<div class="input-area">
+  <mat-form-field class="input-width">
+    <mat-label>Enter People</mat-label>
+    <textarea
+      matInput
+      id="familyInput"
+      autofocus
+      cdkTextareaAutosize
+      placeholder=""
+      class="input-size"
+      (resized)="onFamilyResized($event)"
+      (input)="onValueChange($event)"
+      [ngStyle]="{'height': familyHeight}"
+      [(ngModel)]="familyText"
+      [ngModelOptions]="{standalone: true}"
+    ></textarea>
+    <button
+      class="team-button1"
+      *ngIf="familyText"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      matTooltip="Clear people list"
+      (click)="familyText=''; toastMessage('People Cleared');"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+    <button
+      class="team-button2"
+      matSuffix
+      mat-icon-button
+      aria-label="Help"
+      matTooltip="Show help information"
+      (click)="showFamilyHelp();"
+    >
+      <mat-icon>question_mark</mat-icon>
+    </button>
+  </mat-form-field>
+  <mat-form-field class="input-width">
+    <mat-progress-spinner
+      class="spinner"
+      color="primary"
+      mode="indeterminate"
+      [style.visibility]="showProgress ? 'visible' : 'hidden'"
+    >
+    </mat-progress-spinner>
+    <mat-label>{{teamsLabel}}</mat-label>
+    <textarea
+      matInput
+      id="teamInput"
+      placeholder=""
+      class="input-size team-input"
+      (resized)="onTeamResized($event)"
+      [ngStyle]="{'height': teamHeight}"
+      [(ngModel)]="teamText"
+      [ngModelOptions]="{standalone: true}"
+      [style.color]="errorColor ? 'red' : 'black'"
+    >
+    </textarea>
+    <button
+      class="team-button1"
+      *ngIf="teamText"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      matTooltip="Clear teams list"
+      (click)="onClearTeams()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+    <button
+      class="team-button2"
+      *ngIf="teamText"
+      matSuffix
+      mat-icon-button
+      aria-label="Copy"
+      matTooltip="Copy teams to clipboard"
+      (click)="toastMessage('Teams Copied to Clipboard')"
+      [cdkCopyToClipboard]="teamText"
+    >
+      <mat-icon>content_copy</mat-icon>
+    </button>
+  </mat-form-field>
+</div>
+<mat-accordion multi>
+  <mat-expansion-panel
+    matRipple
+    [matRippleDisabled]="true"
+    expanded="true"
+    class="input-spacing"
+  >
+    <mat-expansion-panel-header>
+      <mat-panel-title>Basic Options</mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <p style="margin-top: 0px">
+      &nbsp;Specify Either:<br />
+      <mat-button-toggle-group
+        [(ngModel)]="teamControl"
+        aria-label="Team Control"
+        class="toggler"
+        (change)="onTeamControlChange($event.value)"
+      >
+        <mat-button-toggle value="size">Team Size</mat-button-toggle>
+        <mat-button-toggle value="count">Team Count</mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <mat-form-field style="width: 130px">
+        <mat-label>{{teamControlLabel}}</mat-label>
+        <input
+          type="number"
+          min="2"
+          matInput
+          [(ngModel)]="sizeorcount"
+          matTooltip="Number greater than two"
+        />
+      </mat-form-field>
+    </p>
+
+    <p>
+      <mat-slide-toggle
+        matTooltip="Allow people on the same line (families) to be on the same team"
+        [(ngModel)]="oktogether"
+        >Ok Together</mat-slide-toggle
+      >
+
+      <mat-slide-toggle
+        class="input-spacing"
+        matTooltip="Try to create teams of the same generation (parents v kids)"
+        [(ngModel)]="generations"
+        >Parents v. Kids
+      </mat-slide-toggle>
+
+      <mat-slide-toggle
+        class="input-spacing"
+        matTooltip="Try to match team size, but allow uneven team sizes"
+        [(ngModel)]="uneven"
+        (change)="onUnevenChange();"
+        >Allow Uneven Teams</mat-slide-toggle
+      >
+
+      <mat-slide-toggle
+        class="input-spacing"
+        matTooltip="Drop random people to make even team sizes"
+        [(ngModel)]="drop"
+        (change)="onDropChange();"
+        >Drop Extra People</mat-slide-toggle
+      >
+    </p></mat-expansion-panel
+  >
+
+  <mat-expansion-panel class="input-spacing">
+    <mat-expansion-panel-header>
+      <mat-panel-title>Advanced Options</mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div>
+      <label class="">Maximum Tries: </label>
+      <mat-slider
+        matTooltip="Maximum number of attempts to create valid teams"
+        min="100"
+        [max]="maxTries"
+        step="100"
+        discrete
+      >
+        <input matSliderThumb [(ngModel)]="tries" />
+      </mat-slider>
+    </div>
+    <div style="margin-top: 0px">
+      <mat-slide-toggle
+        matTooltip="Display teams in JSON format"
+        [(ngModel)]="json"
+        >JSON Output
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        class="input-spacing"
+        matTooltip="Use commas instead of dashes between team members"
+        [(ngModel)]="commas"
+        [disabled]="json ? 'true' : 'false'"
+        >Comma Separated Teams
+      </mat-slide-toggle>
+      <mat-form-field
+        appearance="fill"
+        class="input-spacing"
+        style="position: relative; top: -11px; left: 15px; width: 180px"
+        matTooltip="Used with 'Uneven' and 'Team Size' options to round resulting number of teams"
+      >
+        <mat-label>Team Count Rounding</mat-label>
+        <mat-select
+          [(value)]="rounding"
+          [disabled]="uneven && teamControl == 'size' ? 'false' : 'true'"
+        >
+          <mat-option value="closest">closest</mat-option>
+          <mat-option value="down">down</mat-option>
+          <mat-option value="up">up</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div style="margin-top: 10px">
+        <mat-slide-toggle
+          matTooltip="Use optimized browser local version. Disable if errors occur"
+          [(ngModel)]="local"
+          (change)="onLocalChange();"
+          [disabled]="enableLocal ? 'false' : 'true'"
+          >Super Fast Version
+        </mat-slide-toggle>
+      </div>
+      <div style="margin-top: 30px">
+        <button
+          mat-raised-button
+          (click)="onResetOptions()"
+          color="basic"
+          matTooltip="Reset all options to intial values"
+        >
+          Reset All Options
+        </button>
+      </div>
+    </div>
+  </mat-expansion-panel>
+</mat-accordion>
+<input
+  type="file"
+  class="file-input"
+  accept="text/plain"
+  (change)="onFileSelected($event)"
+  #fileUpload
+/>
+<!-- Copyright 2023 Google LLC. All Rights Reserved.
+    Use of this source code is governed by an MIT-style license that
+    can be found in the LICENSE file at https://angular.io/license -->

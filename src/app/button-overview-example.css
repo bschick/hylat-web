@@ -1,0 +1,90 @@
+.input-area {
+  margin-top: 10pt;
+  min-width: 200pt;
+  width: 100%;
+}
+
+.team-button1 {
+  position: absolute;
+  top: 2px;
+  margin-left: -102px;
+  z-index: 999;
+}
+
+.team-button2 {
+  position: absolute;
+  top: 2px;
+  margin-left: -52px;
+  z-index: 999;
+}
+
+.team-button3 {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 999;
+}
+
+.spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -50px 0 0 -50px;
+  z-index: 999;
+}
+
+.toggler {
+  position: relative;
+  top: -5px;
+  margin-right: 15px;
+}
+
+.team-input {
+  resize: none;
+}
+
+.input-spacing {
+  margin-left: 15pt;
+}
+
+.input-button {
+  width: 136px;
+  margin-left: 15pt;
+}
+
+mat-slider {
+  width: 200px;
+}
+
+.input-full-width {
+  width: 100%;
+  min-width: 450pt;
+}
+
+.input-width {
+  width: 48%;
+  margin-left: 15pt;
+}
+
+.input-size {
+  min-height: 200pt;
+  width: 100%;
+  margin-top: 6px;
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.help-dialog-section {
+  margin: 5px 10px;
+  font-weight: bold;
+  background-color: lightgray;
+  padding: 8px;
+  display: flex;
+}
+
+.file-input {
+  display: none;
+}
