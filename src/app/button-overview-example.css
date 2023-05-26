@@ -1,27 +1,18 @@
-.input-area {
-  margin-top: 10pt;
-  min-width: 200pt;
-  width: 100%;
+.link {
+  cursor: pointer;
 }
 
-.team-button1 {
+.txt-area-button1 {
   position: absolute;
   top: 2px;
   margin-left: -102px;
   z-index: 999;
 }
 
-.team-button2 {
+.txt-area-button2 {
   position: absolute;
   top: 2px;
   margin-left: -52px;
-  z-index: 999;
-}
-
-.team-button3 {
-  position: absolute;
-  top: 2px;
-  right: 2px;
   z-index: 999;
 }
 
@@ -39,42 +30,39 @@
   margin-right: 15px;
 }
 
-.team-input {
-  resize: none;
-}
-
 .input-spacing {
   margin-left: 15pt;
 }
 
-.input-button {
+.top-button {
   width: 136px;
-  margin-left: 15pt;
 }
 
 mat-slider {
   width: 200px;
 }
 
-.input-full-width {
+.input-area {
+  margin: 15px 0 10px 0;
+  min-width: 450px;
   width: 100%;
-  min-width: 450pt;
 }
 
-.input-width {
-  width: 48%;
-  margin-left: 15pt;
+.flx-container {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 15px;
+  justify-content: space-between;
+  align-items: stretch;
 }
 
-.input-size {
+.flx-item {
+  flex: 1;
+}
+
+.txt-areas {
   min-height: 200pt;
-  width: 100%;
-  margin-top: 6px;
-  height: 100%;
-}
-
-.full-width {
-  width: 100%;
+  resize: none;
 }
 
 .help-dialog-section {

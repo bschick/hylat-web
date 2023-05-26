@@ -1,4 +1,4 @@
-import { Component, Renderer2, Inject, ViewChild } from '@angular/core';
+import { Component, Renderer2, Inject, ViewChild, OnInit } from '@angular/core';
 import {
   MatDialog,
   MAT_DIALOG_DATA,
@@ -8,11 +8,11 @@ import { TeamsService, Teams, Params } from './teams.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatRipple } from '@angular/material/core';
 import { loadPyodide } from 'pyodide';
+import { HttpParams } from '@angular/common/http';
 
 export interface DialogData {
   message: string;
 }
-
 /**
  * @title Teams
  */
@@ -22,7 +22,8 @@ export interface DialogData {
   providers: [TeamsService],
   styleUrls: ['button-overview-example.css'],
 })
-export class ButtonOverviewExample {
+export class ButtonOverviewExample implements OnInit {
+  private pyodide: any = undefined;
   public teamHeight: string = '200pt';
   public familyHeight: string = '200pt';
   private dirty: boolean;
@@ -31,9 +32,7 @@ export class ButtonOverviewExample {
   public hylatReady: Promise<void>;
   public teamsLabel = 'Teams';
   public teamText = '';
-  public hideProgress = true;
   public showProgress = false;
-  //  public enableRounding = false;
   public enableLocal = false;
   public errorColor = false;
   public maxTries = 1000;
@@ -64,6 +63,77 @@ export class ButtonOverviewExample {
     this.hylatReady = this.loadHylat();
   }
 
+  ngOnInit(): void {
+    var params = new HttpParams({ fromString: window.location.search });
+    if (params.get('teamsize')) {
+      this.sizeorcount = Math.max(2, Number(params.get('teamsize')));
+      this.teamControl = 'size';
+    } else if (params.get('teamcount')) {
+      this.sizeorcount = Math.max(2, Number(params.get('teamcount')));
+      this.teamControl = 'count';
+    }
+    if (['true', '1'].includes(params.get('oktogether')!)) {
+      this.oktogether = true;
+    }
+    if (['true', '1'].includes(params.get('generations')!)) {
+      this.generations = true;
+    }
+    if (['true', '1'].includes(params.get('uneven')!)) {
+      this.uneven = true;
+    } else if (['true', '1'].includes(params.get('drop')!)) {
+      this.drop = true;
+    }
+    if (['true', '1'].includes(params.get('json')!)) {
+      this.json = true;
+    } else if (['true', '1'].includes(params.get('commas')!)) {
+      this.commas = true;
+    }
+    if (params.get('people')) {
+      this.familyText = decodeURIComponent(params.get('people')!);
+      this.showProgress = true;
+      // wait for pyodide to load or fail so we can use the local version if possible
+      this.hylatReady.finally(() => {
+        this.showProgress = false;
+        this.getTeams();
+      });
+    }
+  }
+
+  onNewPage(): void {
+    var url = window.location.origin;
+    var params = new HttpParams();
+    if (this.teamControl == 'count') {
+      params = params.append('teamcount', this.sizeorcount);
+    } else if (this.sizeorcount != 2) {
+      params = params.append('teamsize', this.sizeorcount);
+    }
+
+    if (this.oktogether) {
+      params = params.append('oktogether', this.oktogether);
+    }
+    if (this.generations) {
+      params = params.append('generations', this.generations);
+    }
+    if (this.uneven) {
+      params = params.append('uneven', this.uneven);
+    } else if (this.drop) {
+      params = params.append('drop', this.drop);
+    }
+    if (this.json) {
+      params = params.append('json', this.json);
+    } else if (this.commas) {
+      params = params.append('commas', this.commas);
+    }
+    if (this.familyText.length > 1) {
+      params = params.append('people', encodeURIComponent(this.familyText));
+    }
+
+    if (params.keys().length > 0) {
+      url += `?${params.toString()}`;
+    }
+    window.open(url);
+  }
+
   onResetOptions(): void {
     this.generations = false;
     this.oktogether = false;
@@ -86,34 +156,45 @@ export class ButtonOverviewExample {
   }
 
   async loadHylat() {
-    let pyodide = await loadPyodide({
+    return loadPyodide({
       indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.2/full/',
       stdLibURL:
         'https://cdn.jsdelivr.net/pyodide/v0.23.2/full/python_stdlib.zip',
-    });
-    await pyodide.loadPackage('numpy');
-    return fetch('https://teams.schicks.net/hylat.zip', {
-      method: 'GET',
     })
-      .then((response) => {
-        console.log(`hylat download: ${response.status}`);
-        if (!response.ok) {
-          this.local = false;
-          this.enableLocal = false;
-          this.maxTries = 1000;
-          this.tries = 200;
-          throw new Error(`HTTP error, status = ${response.status}}`);
+      .then(async (pyodide) => {
+        return pyodide.loadPackage('numpy').then(
+          () => {
+            // ready for usage
+            this.pyodide = pyodide;
+          },
+          (error) => {
+            throw error;
+          }
+        );
+      })
+      .then(async () => {
+        return this.pyodide
+          ? fetch('https://teams.schicks.net/hylat.zip', { method: 'GET' })
+          : undefined;
+      })
+      .then(async (response) => {
+        if (response && response.ok) {
+          console.log(`hylat download: ${response.status}`);
+          return response.arrayBuffer();
+        } else {
+          return undefined;
         }
-        return response.arrayBuffer();
       })
       .then((buffer) => {
-        pyodide.unpackArchive(buffer, 'zip');
-        this.hylat = pyodide.pyimport('hylat');
-        if (this.hylat) {
-          this.local = true;
-          this.enableLocal = true;
-          this.maxTries = 10000;
-          this.tries = 2000;
+        if (buffer) {
+          this.pyodide.unpackArchive(buffer, 'zip');
+          this.hylat = this.pyodide.pyimport('hylat');
+          if (this.hylat) {
+            this.maxTries = 10000;
+            this.tries = 2000;
+            this.enableLocal = true;
+            this.local = true;
+          }
         }
       });
   }
@@ -127,11 +208,7 @@ export class ButtonOverviewExample {
   onUnevenChange(): void {
     if (this.uneven) {
       this.drop = false;
-      //      if (this.teamControl == 'size') {
-      //        this.enableRounding = true;
-      //      }
     } else {
-      //      this.enableRounding = false;
     }
   }
 
@@ -271,7 +348,6 @@ export class ButtonOverviewExample {
       var start = Date.now();
       var params = this.hylat.default_args();
       this.assignParams(params);
-      this.hylat.normalize_args(params);
       //helpful for debugging
       //      params.verbose = 1;
       var resp = this.hylat.wrapped_teams_from_str(params, this.familyText);
@@ -279,6 +355,7 @@ export class ButtonOverviewExample {
       if (err) {
         var end = Date.now();
         this.showError(err);
+        this.ripple.launch({ centered: true });
         console.log(`local time ${end - start}ms.`);
       } else {
         var end = Date.now();
@@ -357,8 +434,6 @@ export class ButtonOverviewExample {
   }
 
   onFileSelected(event: any): void {
-    console.log(event.target.files[0]);
-
     var fileReader = new FileReader();
     fileReader.onload = (e) => {
       if (fileReader.result) {
@@ -411,17 +486,6 @@ Parent Gray: Kid Gray`;
 
   onValueChange(event: any): void {
     this.dirty = true;
-  }
-
-  onFamilyResized(event: any): void {
-    // thanksfully this doesn't cause a loop (on chrome)
-    this.teamHeight = `${event.newRect.height}px`;
-  }
-
-  onTeamResized(event: any): void {
-    // thanksfully this doesn't cause a loop (on chrome)...
-    // actually it does unless cdkTextareaAutosize is also used
-    //    this.familyHeight = `${event.newRect.height}px`;
   }
 }
 

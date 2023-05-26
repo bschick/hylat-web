@@ -11,7 +11,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClientModule } from '@angular/common/http';
-import { AngularResizeEventModule } from 'angular-resize-event';
+import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [ButtonOverviewExample, LoadExampleDialog, HelpDialog],
@@ -24,7 +24,7 @@ import { AngularResizeEventModule } from 'angular-resize-event';
     MatNativeDateModule,
     MaterialExampleModule,
     ReactiveFormsModule,
-    AngularResizeEventModule,
+    AppRoutingModule,
   ],
   bootstrap: [ButtonOverviewExample],
 })
