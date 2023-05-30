@@ -16,6 +16,14 @@
   z-index: 999;
 }
 
+/* used in help dialog */
+.team-button3 {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  z-index: 999;
+}
+
 .spinner {
   position: absolute;
   top: 50%;
@@ -51,7 +59,6 @@ mat-slider {
 .flx-container {
   display: flex;
   flex-wrap: nowrap;
-  gap: 15px;
   justify-content: space-between;
   align-items: stretch;
 }
@@ -60,8 +67,16 @@ mat-slider {
   flex: 1;
 }
 
+.dragger {
+  width: 16px;
+  cursor: ew-resize;
+  padding: 50px 0 72px 0;
+  flex: 0 0 auto;
+}
+
 .txt-areas {
-  min-height: 200pt;
+  min-height: 265px;
+  min-width: 195px;
   resize: none;
 }
 

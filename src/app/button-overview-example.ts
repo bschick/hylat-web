@@ -1,4 +1,11 @@
-import { Component, Renderer2, Inject, ViewChild, OnInit } from '@angular/core';
+import {
+  Component,
+  Renderer2,
+  Inject,
+  ViewChild,
+  ElementRef,
+  OnInit,
+} from '@angular/core';
 import {
   MatDialog,
   MAT_DIALOG_DATA,
@@ -23,9 +30,8 @@ export interface DialogData {
   styleUrls: ['button-overview-example.css'],
 })
 export class ButtonOverviewExample implements OnInit {
+  private mouseDown = false;
   private pyodide: any = undefined;
-  public teamHeight: string = '200pt';
-  public familyHeight: string = '200pt';
   private dirty: boolean;
   public familyText = '';
   public hylat: any = null;
@@ -37,6 +43,9 @@ export class ButtonOverviewExample implements OnInit {
   public errorColor = false;
   public maxTries = 1000;
   @ViewChild(MatRipple) ripple: MatRipple;
+  @ViewChild('peopleField') peopleField: ElementRef;
+  @ViewChild('teamField') teamField: ElementRef;
+  @ViewChild('inputArea') inputArea: ElementRef;
 
   // options
   public generations = false;
@@ -197,6 +206,33 @@ export class ButtonOverviewExample implements OnInit {
           }
         }
       });
+  }
+
+  onDraggerMouseDown(): void {
+    this.mouseDown = true;
+  }
+
+  onDraggerMouseMove(event: MouseEvent): void {
+    if (this.mouseDown) {
+      var pointerRelativeXpos =
+        event.clientX - this.inputArea.nativeElement.offsetLeft;
+      const minWidth = 200;
+
+      const areaWidth = this.inputArea.nativeElement.offsetWidth - 16; // 16 for the size of the drag area
+      const peopleWidth = this.peopleField.nativeElement.offsetWidth;
+      const teamWidth = this.teamField.nativeElement.offsetWidth;
+
+      var newPeopleWidth = Math.max(minWidth, pointerRelativeXpos - 8); // 8 to center in drag area
+
+      this.peopleField.nativeElement.style.flexGrow =
+        newPeopleWidth / areaWidth;
+      this.teamField.nativeElement.style.flexGrow =
+        (areaWidth - newPeopleWidth) / areaWidth;
+    }
+  }
+
+  onDraggerMouseUp(): void {
+    this.mouseDown = false;
   }
 
   onDropChange(): void {

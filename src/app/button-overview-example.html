@@ -10,7 +10,7 @@
     ></span
   >
 </p>
-<div class="input-area">
+<div class="input-area" (mouseup)="onDraggerMouseUp();">
   <button
     mat-raised-button
     (click)="onMakeTeamsClicked()"
@@ -40,90 +40,106 @@
     Load Example
   </button>
 </div>
-<div class="input-area flx-container">
-  <mat-form-field class="flx-item">
-    <mat-label>Enter People</mat-label>
-    <textarea
-      matInput
-      id="familyInput"
-      autofocus
-      cdkTextareaAutosize
-      placeholder=""
-      class="txt-areas"
-      (input)="onValueChange($event)"
-      [ngStyle]="{'height': familyHeight}"
-      [(ngModel)]="familyText"
-      [ngModelOptions]="{standalone: true}"
-    ></textarea>
-    <button
-      class="txt-area-button1"
-      *ngIf="familyText"
-      matSuffix
-      mat-icon-button
-      aria-label="Clear"
-      matTooltip="Clear people list"
-      (click)="familyText=''; toastMessage('People Cleared');"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-    <button
-      class="txt-area-button2"
-      matSuffix
-      mat-icon-button
-      aria-label="Help"
-      matTooltip="Show help information"
-      (click)="showFamilyHelp();"
-    >
-      <mat-icon>question_mark</mat-icon>
-    </button>
-  </mat-form-field>
-  <mat-form-field class="flx-item" style="">
-    <mat-progress-spinner
-      class="spinner"
-      color="primary"
-      mode="indeterminate"
-      [style.visibility]="showProgress ? 'visible' : 'hidden'"
-    >
-    </mat-progress-spinner>
-    <mat-label>{{teamsLabel}}</mat-label>
-    <textarea
-      matInput
-      id="teamInput"
-      placeholder=""
-      class="txt-areas"
-      cdkTextareaAutosize
-      [ngStyle]="{'height': teamHeight}"
-      [(ngModel)]="teamText"
-      [ngModelOptions]="{standalone: true}"
-      [style.color]="errorColor ? 'red' : 'black'"
-    >
-    </textarea>
-    <button
-      class="txt-area-button1"
-      *ngIf="teamText"
-      matSuffix
-      mat-icon-button
-      aria-label="Clear"
-      matTooltip="Clear teams list"
-      (click)="onClearTeams()"
-    >
-      <mat-icon>close</mat-icon>
-    </button>
-    <button
-      class="txt-area-button2"
-      *ngIf="teamText"
-      matSuffix
-      mat-icon-button
-      aria-label="Copy"
-      matTooltip="Copy teams to clipboard"
-      (click)="toastMessage('Teams Copied to Clipboard')"
-      [cdkCopyToClipboard]="teamText"
-    >
-      <mat-icon>content_copy</mat-icon>
-    </button>
-  </mat-form-field>
+<div
+  (mouseup)="onDraggerMouseUp();"
+  (mousemove)="onDraggerMouseMove($event);"
+  #inputArea
+  class="input-area flx-container"
+>
+  <div #peopleField class="flx-item">
+    <mat-form-field [style.width.%]="100" [style.height.%]="100">
+      <mat-label>Enter People</mat-label>
+      <textarea
+        matInput
+        id="familyInput"
+        autofocus
+        cdkTextareaAutosize
+        placeholder=""
+        class="txt-areas"
+        (input)="onValueChange($event)"
+        [(ngModel)]="familyText"
+        [ngModelOptions]="{standalone: true}"
+      ></textarea>
+      <button
+        class="txt-area-button1"
+        *ngIf="familyText"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        matTooltip="Clear people list"
+        (click)="familyText=''; toastMessage('People Cleared');"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+      <button
+        class="txt-area-button2"
+        matSuffix
+        mat-icon-button
+        aria-label="Help"
+        matTooltip="Show help information"
+        (click)="showFamilyHelp();"
+      >
+        <mat-icon>question_mark</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+  <div
+    class="dragger"
+    (mousedown)="onDraggerMouseDown();"
+    style="display: flex; flex-direction: column; justify-content: center"
+  >
+    <mat-icon style="font-size: 18px; margin-left: 0px"
+      >drag_indicator
+    </mat-icon>
+  </div>
+  <div #teamField class="flx-item">
+    <mat-form-field [style.width.%]="100" [style.height.%]="100">
+      <mat-progress-spinner
+        class="spinner"
+        color="primary"
+        mode="indeterminate"
+        [style.visibility]="showProgress ? 'visible' : 'hidden'"
+      >
+      </mat-progress-spinner>
+      <mat-label>{{teamsLabel}}</mat-label>
+      <textarea
+        matInput
+        id="teamInput"
+        placeholder=""
+        class="txt-areas"
+        cdkTextareaAutosize
+        [(ngModel)]="teamText"
+        [ngModelOptions]="{standalone: true}"
+        [style.color]="errorColor ? 'red' : 'black'"
+      >
+      </textarea>
+      <button
+        class="txt-area-button1"
+        *ngIf="teamText"
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        matTooltip="Clear teams list"
+        (click)="onClearTeams()"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+      <button
+        class="txt-area-button2"
+        *ngIf="teamText"
+        matSuffix
+        mat-icon-button
+        aria-label="Copy"
+        matTooltip="Copy teams to clipboard"
+        (click)="toastMessage('Teams Copied to Clipboard')"
+        [cdkCopyToClipboard]="teamText"
+      >
+        <mat-icon>content_copy</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
 </div>
-<mat-accordion multi class="input-area">
+<mat-accordion multi class="input-area" (mouseup)="onDraggerMouseUp();">
   <mat-expansion-panel
     matRipple
     [matRippleDisabled]="true"
