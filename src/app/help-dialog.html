@@ -13,64 +13,89 @@
   <p>
     Create teams from a list of people. This tool was originally built to make
     teams from families attending a school ping-pong tournament, but can be used
-    to make teams from any set of people. Each line is a group of people who you
-    want to be on different teams if possible. Each line could be a family or
-    any group of people who you want on different teams. Within each line there
-    are two categories of people, like parents and kids that this tool can
-    either spread out on different teams or put together.
+    to make teams from any set of people. The simplest way to use this tool is
+    to enter one person per line and Team Generator will create random teams
+    based on the options you select.
   </p>
-  The format of each line is<br />
-  <div class="help-dialog-section">ParentList : KidList</div>
-  <div style="margin-top: 15px">
-    Where <i>ParentList</i> and <i>KidList</i> are comma seperated names. For
-    example, a line with two parents and one kid would be
+  <p>
+    Sometimes you may want more control over team creation. In particular, it is
+    common to want certain people to be on different teams. With this tool you
+    can controll that by putting those people on the same line separated by
+    commas. Team generator will ensure people on the same line are put on
+    different teams. For example, each line could represent a family whose
+    members you want on different teams.
+  </p>
+  <p>
+    You can go further by adding one or more categories to each line. Categories
+    are created using colon separators, and allow you to control how people in
+    those categories are distributed across teams. For example, each family line
+    could have categories for kids and for parents that the tool will evenly
+    distribute accoss teams to avoid teams of all parents or kids.
+  </p>
+  <div style="margin-top: 20px">
+    Using the family example, here are are a few lines with four people. Since
+    <i>Samantha</i> and <i>Sister</i> are on the same line they will be put on
+    different teams.
   </div>
   <div class="help-dialog-section">
     <div #help1 style="flex-grow: 1">
-      Ava Peters, Eric Peters : Weston Peters
+      Samantha Peake, Sister Peake<br />Luke<br />James Freeman
     </div>
     <div style="height: 24px">
       <mat-icon
         (click)="onCopyExample();"
         [cdkCopyToClipboard]="help1.innerText"
+        matTooltip="Copy example to clipboard"
         >content_copy</mat-icon
       >
     </div>
   </div>
 
-  <div style="margin-top: 15px">
-    The <i>ParentList</i> or <i>KidList</i> on each line can be empty. An
-    example line with parents but no kids
+  <div style="margin-top: 20px">
+    The next example adds categoriues with the use of a colon separator.
+    Categories are used to distinguish between kids (before the colon) and
+    parents (after the colon) on each line. People on a single line are still
+    put on different teams and categories are used to evenly distribute people
+    of the same category across teams.
   </div>
   <div class="help-dialog-section">
-    <div #help2 style="flex-grow: 1">Jack Manning, Kelly Manning :</div>
+    <div #help2 style="flex-grow: 1">
+      Weston Peters : Ava Peters, Eric Peters<br />Jack Rossing, Kelly Rossing,
+      Una Rossing: Craig Manning, Sara Ross<br />Hills Wallace: Gordon Wallace
+    </div>
     <div style="height: 24px">
       <mat-icon
         (click)="onCopyExample();"
         [cdkCopyToClipboard]="help2.innerText"
+        matTooltip="Copy example to clipboard"
         >content_copy</mat-icon
       >
     </div>
   </div>
-  <div style="margin-top: 15px">
-    You may leave out the : seperator as a shortcut way to make each person on a
-    line part of the <i>KidList</i> (the second category). An example line with
-    only kids
+
+  <div style="margin-top: 20px">
+    The categories on each line can be empty. The first line below has no kids
+    and two parents while the second line has one kid and one parent.
   </div>
   <div class="help-dialog-section">
-    <div #help2 style="flex-grow: 1">Samantha Peake, Sister Peake</div>
+    <div #help3 style="flex-grow: 1">
+      : Felicity Allan, Bella Coleman<br />Hills Wallace: Gordon Wallace
+    </div>
     <div style="height: 24px">
       <mat-icon
         (click)="onCopyExample();"
-        [cdkCopyToClipboard]="help2.innerText"
+        [cdkCopyToClipboard]="help3.innerText"
+        matTooltip="Copy example to clipboard"
         >content_copy</mat-icon
       >
     </div>
   </div>
-  <div style="margin-top: 15px">
+  <div style="margin-top: 20px">
     Rather than famlies with parents and kids, you can use whatever categories
     you have. For example, each line could be a school class with "TeacherList:
-    StudentList" or have just one category of people. Team Generator will always
-    try to seperate the people on each line into different teams.
+    StudentList". You can also not add any categories or use more than two. Team
+    Generator will always try to put the people on each line onto different
+    teams and then either spread out people in the same category or group them
+    together based on the options you select.
   </div>
 </div>

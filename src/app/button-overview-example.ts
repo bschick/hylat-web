@@ -97,6 +97,9 @@ export class ButtonOverviewExample implements OnInit {
     } else if (['true', '1'].includes(params.get('commas')!)) {
       this.commas = true;
     }
+    if (['closest', 'down', 'up'].includes(params.get('rounding')!)) {
+      this.rounding = params.get('rounding')!;
+    }
     if (params.get('people')) {
       this.familyText = decodeURIComponent(params.get('people')!);
       this.showProgress = true;
@@ -135,6 +138,9 @@ export class ButtonOverviewExample implements OnInit {
     }
     if (this.familyText.length > 1) {
       params = params.append('people', encodeURIComponent(this.familyText));
+    }
+    if (this.rounding != 'closest') {
+      params = params.append('rounding', this.rounding);
     }
 
     if (params.keys().length > 0) {
@@ -329,12 +335,12 @@ export class ButtonOverviewExample implements OnInit {
     teams: string,
     team_count: number,
     player_count: number,
-    drop_count: number
+    drop_count: number,
+    category_count: number
   ): void {
-    var label = `${team_count} Teams ${player_count} Players`;
-    if (this.drop) {
-      label += ` (${drop_count} dropped)`;
-    }
+    var label = `${team_count} Teams, ${player_count} Players${
+      this.drop ? ' (' + drop_count + ' dropped)' : ''
+    }, ${category_count} ${category_count > 1 ? 'Categories' : 'Category'}`;
     this.teamText = teams;
     this.errorColor = false;
     this.teamsLabel = label;
@@ -353,7 +359,8 @@ export class ButtonOverviewExample implements OnInit {
           resp['teams'],
           resp['team_count'],
           resp['player_count'],
-          resp['drop_count']
+          resp['drop_count'],
+          resp['category_count']
         );
         this.showProgress = false;
         console.log(`remote time ${end - start}ms. tries ${resp['tries']}`);
@@ -399,7 +406,8 @@ export class ButtonOverviewExample implements OnInit {
           resp.get('teams'),
           resp.get('team_count'),
           resp.get('player_count'),
-          resp.get('drop_count')
+          resp.get('drop_count'),
+          resp.get('category_count')
         );
         console.log(`local time ${end - start}ms. tries ${resp.get('tries')}`);
       }
@@ -508,15 +516,15 @@ export class ButtonOverviewExample implements OnInit {
 
   loadExample(): void {
     this.familyText = `\
-Gordon Wallace: Hills Wallace
-Ava Peters, Eric Peters : Weston Peters
-Jack Manning: Craig Manning, Sara Manning
-: Samantha Peake, Sister Peake
-: Luke
-: James Freeman
-Felicity Allan:
-Olivia Randall: Matthew Randall,Parker Randall
-Parent Gray: Kid Gray`;
+Hills Wallace: Gordon Wallace
+Weston Peters: Ava Peters, Eric Peters
+Jack Rossing, Kelly Rossing: Craig Manning, Sara Ross
+Samantha Peake, Sister Peake
+Luke
+James Freeman
+: Felicity Allan, Bella Coleman
+Matthew Randall,Parker Randall: Olivia Randall
+Kid Gray: Parent Gray`;
     this.dirty = false;
   }
 

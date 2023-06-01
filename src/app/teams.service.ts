@@ -7,6 +7,7 @@ export interface Teams {
   team_count: number;
   player_count: number;
   drop_count: number;
+  category_count: number;
   tries: number;
   teams: string;
 }
