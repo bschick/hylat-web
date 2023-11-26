@@ -172,9 +172,9 @@ export class ButtonOverviewExample implements OnInit {
 
   async loadHylat() {
     return loadPyodide({
-      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.2/full/',
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/',
       stdLibURL:
-        'https://cdn.jsdelivr.net/pyodide/v0.23.2/full/python_stdlib.zip',
+        'https://cdn.jsdelivr.net/pyodide/v0.23.4/full/python_stdlib.zip',
     })
       .then(async (pyodide) => {
         return pyodide.loadPackage('numpy').then(
@@ -383,8 +383,14 @@ export class ButtonOverviewExample implements OnInit {
   }
 
   getTeamsLocal(): void {
-    this.hylatReady.then(() => {
+    this.showProgress = true;
+
+    // Making this async doesn't really help because the processing still
+    // happens on the main thread (preventing UI refesh). Would have to
+    // movethis to a webworker
+    this.hylatReady.then(async () => {
       if (!this.hylat) {
+        this.showProgress = false;
         console.log('local version did not load, try again');
         return;
       }
@@ -396,11 +402,13 @@ export class ButtonOverviewExample implements OnInit {
       var resp = this.hylat.wrapped_teams_from_str(params, this.familyText);
       var err = resp.get('error');
       if (err) {
+        this.showProgress = false;
         var end = Date.now();
         this.showError(err);
         this.ripple.launch({ centered: true });
         console.log(`local time ${end - start}ms.`);
       } else {
+        this.showProgress = false;
         var end = Date.now();
         this.showTeams(
           resp.get('teams'),
