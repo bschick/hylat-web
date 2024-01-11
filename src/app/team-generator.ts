@@ -20,16 +20,45 @@ import { HttpParams } from '@angular/common/http';
 export interface DialogData {
   message: string;
 }
+
+// Set only if num is betwee min and max (inclusive) when min and max are not null
+function setIfBetween(
+  check: string | null,
+  min: number | null,
+  max: number | null,
+  setter: (num: number) => void
+): void {
+  let num = Number(check);
+  if (check != null && !Number.isNaN(num)) {
+    if ((min == null || num >= min) && (max == null || num <= max)) {
+      setter(num);
+    }
+  }
+}
+
+function setIfBoolean(
+  check: string | null,
+  setter: (bool: boolean) => void
+): void {
+  if (check != null) {
+    if (['true', '1', 'yes', 'on'].includes(check.toLowerCase())) {
+      setter(true);
+    } else if (['false', '0', 'no', 'off'].includes(check.toLowerCase())) {
+      setter(false);
+    }
+  }
+}
+
 /**
  * @title Teams
  */
 @Component({
-  selector: 'button-overview-example',
-  templateUrl: 'button-overview-example.html',
+  selector: 'team-generator',
+  templateUrl: 'team-generator.html',
   providers: [TeamsService],
-  styleUrls: ['button-overview-example.css'],
+  styleUrls: ['team-generator.css'],
 })
-export class ButtonOverviewExample implements OnInit {
+export class TeamGenerator implements OnInit {
   private mouseDown = false;
   private pyodide: any = undefined;
   private dirty: boolean;
@@ -68,38 +97,94 @@ export class ButtonOverviewExample implements OnInit {
     private snackBar: MatSnackBar
   ) {
     this.dirty = false;
-    this.onResetOptions();
     this.hylatReady = this.loadHylat();
   }
 
-  ngOnInit(): void {
-    var params = new HttpParams({ fromString: window.location.search });
-    if (params.get('teamsize')) {
-      this.sizeorcount = Math.max(2, Number(params.get('teamsize')));
+  setSizeOrCount(teamsize: string | null, teamcount: string | null) {
+    if (teamsize) {
       this.teamControl = 'size';
-    } else if (params.get('teamcount')) {
-      this.sizeorcount = Math.max(2, Number(params.get('teamcount')));
+      setIfBetween(teamsize, 2, null, (num) => {
+        this.sizeorcount = num;
+      });
+    } else if (teamcount) {
       this.teamControl = 'count';
+      setIfBetween(teamcount, 2, null, (num) => {
+        this.sizeorcount = num;
+      });
     }
-    if (['true', '1'].includes(params.get('oktogether')!)) {
-      this.oktogether = true;
+  }
+
+  setOkTogether(ok: string | null) {
+    setIfBoolean(ok, (bool) => {
+      this.oktogether = bool;
+    });
+  }
+
+  setGenerations(gens: string | null) {
+    setIfBoolean(gens, (bool) => {
+      this.generations = bool;
+    });
+  }
+
+  setRounding(rounding: string | null) {
+    if (['closest', 'down', 'up'].includes(rounding!)) {
+      this.rounding = rounding!;
     }
-    if (['true', '1'].includes(params.get('generations')!)) {
-      this.generations = true;
+  }
+
+  setUnevenOrDrop(uneven: string | null, drop: string | null) {
+    setIfBoolean(uneven, (bool) => {
+      this.uneven = bool;
+    });
+    if (this.uneven) {
+      this.drop = false;
+    } else {
+      setIfBoolean(drop, (bool) => {
+        this.drop = bool;
+      });
     }
-    if (['true', '1'].includes(params.get('uneven')!)) {
-      this.uneven = true;
-    } else if (['true', '1'].includes(params.get('drop')!)) {
-      this.drop = true;
+  }
+
+  setJsonOrCommas(json: string | null, commas: string | null) {
+    setIfBoolean(json, (bool) => {
+      this.json = bool;
+    });
+    if (this.json) {
+      this.commas = false;
+    } else {
+      setIfBoolean(commas, (bool) => {
+        this.commas = bool;
+      });
     }
-    if (['true', '1'].includes(params.get('json')!)) {
-      this.json = true;
-    } else if (['true', '1'].includes(params.get('commas')!)) {
-      this.commas = true;
-    }
-    if (['closest', 'down', 'up'].includes(params.get('rounding')!)) {
-      this.rounding = params.get('rounding')!;
-    }
+  }
+
+  ngOnInit(): void {
+    // local storage first so that url params win
+    this.setSizeOrCount(
+      localStorage.getItem('teamsize'),
+      localStorage.getItem('teamcount')
+    );
+    this.setOkTogether(localStorage.getItem('oktogether'));
+    this.setGenerations(localStorage.getItem('generations'));
+    this.setUnevenOrDrop(
+      localStorage.getItem('uneven'),
+      localStorage.getItem('drop')
+    );
+    this.setJsonOrCommas(
+      localStorage.getItem('json'),
+      localStorage.getItem('commas')
+    );
+    this.setRounding(localStorage.getItem('rounding'));
+
+    var params = new HttpParams({ fromString: window.location.search });
+
+    this.setSizeOrCount(params.get('teamsize'), params.get('teamcount'));
+    this.setOkTogether(params.get('oktogether'));
+    this.setGenerations(params.get('generations'));
+    this.setUnevenOrDrop(params.get('uneven'), params.get('drop'));
+    this.setJsonOrCommas(params.get('json'), params.get('commas'));
+    this.setRounding(params.get('rounding'));
+
     if (params.get('people')) {
       this.familyText = decodeURIComponent(params.get('people')!);
       this.showProgress = true;
@@ -168,6 +253,27 @@ export class ButtonOverviewExample implements OnInit {
       this.maxTries = 1000;
       this.tries = 200;
     }
+
+    localStorage.clear();
+  }
+
+  saveOptions(): void {
+    // Done this way to match onNewPage
+    if (this.teamControl == 'count') {
+      localStorage.setItem('teamcount', this.sizeorcount.toString());
+      localStorage.removeItem('teamsize');
+    } else if (this.sizeorcount != 2) {
+      localStorage.setItem('teamsize', this.sizeorcount.toString());
+      localStorage.removeItem('teamcount');
+    }
+
+    localStorage.setItem('oktogether', this.oktogether.toString());
+    localStorage.setItem('generations', this.generations.toString());
+    localStorage.setItem('uneven', this.uneven.toString());
+    localStorage.setItem('drop', this.drop.toString());
+    localStorage.setItem('json', this.json.toString());
+    localStorage.setItem('commas', this.commas.toString());
+    localStorage.setItem('rounding', this.rounding);
   }
 
   async loadHylat() {
@@ -250,7 +356,6 @@ export class ButtonOverviewExample implements OnInit {
   onUnevenChange(): void {
     if (this.uneven) {
       this.drop = false;
-    } else {
     }
   }
 
@@ -344,6 +449,8 @@ export class ButtonOverviewExample implements OnInit {
     this.teamText = teams;
     this.errorColor = false;
     this.teamsLabel = label;
+
+    this.saveOptions();
   }
 
   getTeamsRemote(): void {
@@ -558,7 +665,7 @@ export class LoadExampleDialog {
 @Component({
   selector: 'help-dialog',
   templateUrl: 'help-dialog.html',
-  styleUrls: ['button-overview-example.css'],
+  styleUrls: ['team-generator.css'],
 })
 export class HelpDialog {
   constructor(

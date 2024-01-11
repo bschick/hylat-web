@@ -3,18 +3,14 @@ import { NgStyle } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MaterialExampleModule } from '../material.module';
-import {
-  ButtonOverviewExample,
-  HelpDialog,
-  LoadExampleDialog,
-} from './button-overview-example';
+import { TeamGenerator, HelpDialog, LoadExampleDialog } from './team-generator';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
-  declarations: [ButtonOverviewExample, LoadExampleDialog, HelpDialog],
+  declarations: [TeamGenerator, LoadExampleDialog, HelpDialog],
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
@@ -26,6 +22,6 @@ import { AppRoutingModule } from './app-routing.module';
     ReactiveFormsModule,
     AppRoutingModule,
   ],
-  bootstrap: [ButtonOverviewExample],
+  bootstrap: [TeamGenerator],
 })
 export class AppModule {}
