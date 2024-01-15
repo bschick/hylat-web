@@ -292,6 +292,7 @@
   type="file"
   class="file-input"
   accept="text/plain"
+  (click)="onClickFileUpload($event)"
   (change)="onFileSelected($event)"
   #fileUpload
 />

@@ -600,6 +600,11 @@ export class TeamGenerator implements OnInit {
     return params;
   }
 
+  onClickFileUpload(event:any) {
+    // needed to clear previous value so that onchange fires
+    event.target.value = '';
+  }
+   
   onFileSelected(event: any): void {
     var fileReader = new FileReader();
     fileReader.onload = (e) => {
