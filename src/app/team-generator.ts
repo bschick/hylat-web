@@ -16,6 +16,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatRipple } from '@angular/material/core';
 import { loadPyodide } from 'pyodide';
 import { HttpParams } from '@angular/common/http';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 export interface DialogData {
   message: string;
@@ -94,10 +96,16 @@ export class TeamGenerator implements OnInit {
     private r2: Renderer2,
     public dialog: MatDialog,
     private teamsService: TeamsService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private matIconRegistry: MatIconRegistry,
+    private domSanitizer: DomSanitizer
   ) {
     this.dirty = false;
     this.hylatReady = this.loadHylat();
+    this.matIconRegistry.addSvgIcon(
+      "github",
+      this.domSanitizer.bypassSecurityTrustResourceUrl("../assets/github-circle-white-transparent.svg")
+    );
   }
 
   setSizeOrCount(teamsize: string | null, teamcount: string | null) {
