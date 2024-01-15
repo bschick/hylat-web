@@ -303,7 +303,7 @@ export class TeamGenerator implements OnInit {
       })
       .then(async () => {
         return this.pyodide
-          ? fetch('https://teams.schicks.net/hylat.zip', { method: 'GET' })
+          ? fetch('https://teams.schicks.net/assets/hylat.zip', { method: 'GET' })
           : undefined;
       })
       .then(async (response) => {
