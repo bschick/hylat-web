@@ -5,6 +5,8 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "audit": "npm audit fix --force",
+    "build-prod": "rm -rf dist && ng build team-gen -c production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
