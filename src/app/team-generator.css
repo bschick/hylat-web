@@ -16,6 +16,11 @@
   z-index: 999;
 }
 
+.options-header {
+  font-family: Roboto, sans-serif;
+  font-size: 14px;
+}
+
 /* used in help dialog */
 .team-button3 {
   position: absolute;
